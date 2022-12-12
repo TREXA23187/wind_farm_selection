@@ -238,7 +238,7 @@ def gwr_grid(is_gwr_summary=False, is_plot_coefficient=False):
 
         plot_coefficient(x_data_geo, cof_data_column, gwr_filter_t)
 
-    print('-=-=-=-=-=-=-=-=-gwr-test-main-function-finished-=-=-=-=-=-=-=-=-')
+    print('================================END OF SPA GRID MAIN================================')
 
 
 if __name__ == '__main__':
