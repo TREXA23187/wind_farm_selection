@@ -13,6 +13,10 @@ from spreg.ml_error import ML_Error
 from spreg import GM_Lag
 from spreg import GM_Error
 
+from matplotlib.colors import ListedColormap
+from matplotlib import colors
+from matplotlib import cm
+
 from spreg.diagnostics import likratiotest
 
 from pysal.lib import weights
@@ -107,8 +111,9 @@ def plot_axis_grid(name, ax, display_grid=None):
     display_grid[f'{name}_result_normalised'] = (result - result.min(axis=0)) / (
             result.max(axis=0) - result.min(axis=0))
     if display_grid is not None:
-        display_grid.plot(ax=ax, column=f'{name}_result_normalised', cmap='YlOrRd', edgecolor='Black', legend=True,
-                          linewidth=.5)
+        # display_grid.plot(ax=ax, column=f'{name}_result_normalised', cmap='YlOrRd', edgecolor='Black', legend=True,
+        #                   linewidth=.5)
+        display_grid.plot(ax=ax, column=f'{name}_result_normalised', cmap='YlOrRd', edgecolor='Black', linewidth=.5)
 
 
 def plot_ward_factors():
@@ -156,6 +161,9 @@ def plot_ward_factors():
     plot_axis_grid('landscape', ax10, landscape_grid)
     plot_axis_grid('landscape', ax11, landscape_grid)
     plot_axis_grid('landscape', ax12, landscape_grid)
+    norm = colors.Normalize(vmin=0, vmax=1)
+    fig.colorbar(cm.ScalarMappable(norm=norm, cmap='YlOrRd'), ax=axis, orientation='horizontal', shrink=.7, aspect=30,
+                 pad=.1)
 
 
 def plot_coefficient(geo_data, cof_data_column, gwr_filter_t):
@@ -168,13 +176,11 @@ def plot_coefficient(geo_data, cof_data_column, gwr_filter_t):
     for i in range(0, len(cof_data_column)):
         ax = axes[i]
         ax.set_title(cof_data_column[i])
-        # scheme='NaturalBreaks',
-        # geo_data.plot(ax=ax, column=cof_data_column[i], edgecolor='white', cmap='Blues', legend=True,
-        #               scheme='NaturalBreaks', k=5,)
-
-        geo_data.plot(ax=ax, column=cof_data_column[i], edgecolor='white', cmap='Blues', legend=True,
-                      scheme='User_Defined', classification_kwds=dict(bins=[-1, -0.5, 0, 0.5, 1]),
-                      legend_kwds=legend_kwds
+        geo_data.plot(ax=ax, column=cof_data_column[i], edgecolor='white', cmap='Blues', vmin=-1, vmax=1,
+                      legend=True,
+                      # scheme='User_Defined',
+                      # classification_kwds=dict(bins=[-1, -0.5, 0, 0.5, 1]),
+                      # legend_kwds=legend_kwds
                       )
 
         if (gwr_filter_t[i] == 0).any():
@@ -183,6 +189,30 @@ def plot_coefficient(geo_data, cof_data_column, gwr_filter_t):
     for i in range(0, len(axes)):
         ax = axes[i]
         ax.set_axis_off()
+
+    # norm = colors.Normalize(vmin=-1, vmax=1)
+    # fig.colorbar(cm.ScalarMappable(norm=norm, cmap='Blues'), ax=axes, orientation='horizontal', shrink=.7,
+    #              aspect=30,
+    #              pad=.1)
+
+
+def ols(y, x, w, name_y, name_x):
+    ols_result = OLS(y, x, w, spat_diag=True, moran=True, name_y=name_y, name_x=name_x, name_ds=name_y,
+                     name_w='queen')
+
+    return ols_result
+
+
+def ml_lag(y, x, w, name_y, name_x):
+    ml_lag_result = ML_Lag(y, x, w, name_y=name_y, name_x=name_x, name_ds=name_y, name_w='queen')
+
+    return ml_lag_result
+
+
+def ml_error(y, x, w, name_y, name_x):
+    ml_error_result = ML_Error(y, x, w, name_y=name_y, name_x=name_x, name_ds=name_y, name_w='queen')
+
+    return ml_error_result
 
 
 def gwr(y, x, coordinates):
@@ -206,29 +236,9 @@ def mgwr(y, x, coordinates):
 
     mgwr_selector = Sel_BW(coordinates, g_y, g_x, multi=True)
     mgwr_bw = mgwr_selector.search()
-    # print(mgwr_bw)
-    mgwr_results = MGWR(coordinates, g_y, g_x, mgwr_selector).fit()  # 0.823
+    mgwr_results = MGWR(coordinates, g_y, g_x, selector=mgwr_selector).fit()  # 0.823
 
     return mgwr_results
-
-
-def ols(y, x, w, name_y, name_x):
-    ols_result = OLS(y, x, w, spat_diag=True, moran=True, name_y=name_y, name_x=name_x, name_ds=name_y,
-                     name_w='queen')
-
-    return ols_result
-
-
-def sp_lag(y, x, w, name_y, name_x):
-    sp_lag_result = ML_Lag(y, x, w, name_y=name_y, name_x=name_x, name_ds=name_y, name_w='queen')
-
-    return sp_lag_result
-
-
-def sp_error(y, x, w, name_y, name_x):
-    sp_error_result = ML_Error(y, x, w, name_y=name_y, name_x=name_x, name_ds=name_y, name_w='queen')
-
-    return sp_error_result
 
 
 def gm_lag(y, x, w, name_y, name_x):
@@ -253,17 +263,7 @@ def merge_columns(merge_data_list, merge_data_column):
     return merge_result
 
 
-def gwr_ward(is_summary=False, is_plot_coefficient=False, method_list=[]):
-    method_map = {
-        'ols': ols,
-        'gwr': gwr,
-        'mgwr': mgwr,
-        'sp_lag': sp_lag,
-        'sp_error': sp_error,
-        'gm_lag': gm_lag,
-        'gm_error': gm_error
-    }
-
+def model_ward(is_summary=False, is_plot_coefficient=False, method_list=[]):
     residence_grid = get_ward_contain_point('residence', scotland_residence)
 
     scotland_power_station['id'] = scotland_power_station.index
@@ -292,50 +292,52 @@ def gwr_ward(is_summary=False, is_plot_coefficient=False, method_list=[]):
     x = merge_result[merge_data_column].values
     coordinates = list(zip(wind_farm_overlay_grid.centroid.x, wind_farm_overlay_grid.centroid.y))
 
-    w_queen = weights.Queen.from_dataframe(community_council)
+    # w_queen = weights.Queen.from_dataframe(community_council)
+    #
+    # ols_result = ols(y, x, w_queen, name_y='wind_farm', name_x=merge_data_column)
 
-    ols_result = ols(y, x, w_queen, name_y='wind_farm', name_x=merge_data_column)
+    gwr_result = gwr(y, x, coordinates)
 
-    if 'gwr' in method_list:
-        gwr_result = gwr(y, x, coordinates)
-        if is_summary:
-            gwr_result.summary()
-            # lr = likratiotest(ols_result, gwr_result)
-            # print(f'====={lr}=====')
+    # if 'gwr' in method_list:
+    #     gwr_result = gwr(y, x, coordinates)
+    #     if is_summary:
+    #         gwr_result.summary()
+    #         # lr = likratiotest(ols_result, gwr_result)
+    #         # print(f'====={lr}=====')
 
-    if 'mgwr' in method_list:
-        mgwr_result = mgwr(y, x, coordinates)
-        if is_summary:
-            mgwr_result.summary()
-    if 'sp_lag' in method_list:
-        sp_lag_result = sp_lag(y, x, w_queen, name_y='wind_farm', name_x=merge_data_column)
-    if 'sp_error' in method_list:
-        sp_error_result = sp_error(y, x, w_queen, name_y='wind_farm', name_x=merge_data_column)
-    if 'gm_lag' in method_list:
-        gm_lag_result = gm_lag(y, x, w_queen, name_y='wind_farm', name_x=merge_data_column)
-    if 'gm_error' in method_list:
-        gm_error_result = gm_error(y, x, w_queen, name_y='wind_farm', name_x=merge_data_column)
+    # if 'mgwr' in method_list:
+    #     mgwr_result = mgwr(y, x, coordinates)
+    #     if is_summary:
+    #         mgwr_result.summary()
+    # if 'sp_lag' in method_list:
+    #     ml_lag_result = ml_lag(y, x, w_queen, name_y='wind_farm', name_x=merge_data_column)
+    # if 'sp_error' in method_list:
+    #     ml_error_result = ml_error(y, x, w_queen, name_y='wind_farm', name_x=merge_data_column)
+    # if 'gm_lag' in method_list:
+    #     gm_lag_result = gm_lag(y, x, w_queen, name_y='wind_farm', name_x=merge_data_column)
+    # if 'gm_error' in method_list:
+    #     gm_error_result = gm_error(y, x, w_queen, name_y='wind_farm', name_x=merge_data_column)
 
     # if is_summary:
     #     method_results.summary()
     #
-    # if is_plot_coefficient:
-    #     cof_data_column = ['cof_wind_farm'] + [f'cof_{col}' for col in merge_data_column]
-    #
-    #     gwr_coefficient = pd.DataFrame(method_results.params, columns=cof_data_column)
-    #     gwr_filter_t = pd.DataFrame(method_results.filter_tvals())
-    #
-    #     x_data_geo = merge_result
-    #
-    #     x_data_geo = x_data_geo.join(gwr_coefficient)
-    #
-    #     plot_coefficient(x_data_geo, cof_data_column, gwr_filter_t)
+    if is_plot_coefficient:
+        cof_data_column = ['cof_wind_farm'] + [f'cof_{col}' for col in merge_data_column]
+
+        gwr_coefficient = pd.DataFrame(gwr_result.params, columns=cof_data_column)
+        gwr_filter_t = pd.DataFrame(gwr_result.filter_tvals())
+
+        x_data_geo = merge_result
+
+        x_data_geo = x_data_geo.join(gwr_coefficient)
+
+        plot_coefficient(x_data_geo, cof_data_column, gwr_filter_t)
 
     print('================================END OF SPA WARD MAIN================================')
 
 
 if __name__ == '__main__':
     # plot_ward_factors()
-    gwr_ward(is_summary=True, is_plot_coefficient=False, method_list=['gwr'])
+    model_ward(is_summary=False, is_plot_coefficient=True, method_list=['gwr'])
 
     plt.show()

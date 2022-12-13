@@ -1,5 +1,6 @@
 from rasterio import plot as raster_plot
 import matplotlib.pyplot as plt
+from add_widget import add_north, add_scale_bar
 
 from utils.geo_file_path import south_scotland, scotland_power_station, scotland_residence, conservation, wind_farm, \
     temperature, precipitation, population, slope, aspect, land_use, wind_speed, road
@@ -7,9 +8,9 @@ from utils.geo_file_path import south_scotland, scotland_power_station, scotland
 STATIC_CRS = 'epsg:27700'
 
 legend_kwds = {'loc': 'lower right',
-              'markerscale': 0.3,
-              'title_fontsize': 'xx-small',
-              'fontsize': 'xx-small'}
+               'markerscale': 0.3,
+               'title_fontsize': 'xx-small',
+               'fontsize': 'xx-small'}
 
 
 def add_legend_column(data):
@@ -51,6 +52,8 @@ def show_factors():
                                       legend_kwds=legend_kwds)
     south_scotland.to_crs(STATIC_CRS).plot(ax=ax1, alpha=.2, color='orange')
     replace_legend_texts(ax1.get_legend(), ['existing wind farm'])
+    add_north(ax=ax1)
+    # add_scale_bar(ax=ax1, lon0=-2, lat0=54.8, length=200, size=0.05)
 
     add_legend_column(conservation)
     ax2.set_title('conservation')
