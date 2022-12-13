@@ -53,7 +53,6 @@ def show_factors():
     south_scotland.to_crs(STATIC_CRS).plot(ax=ax1, alpha=.2, color='orange')
     replace_legend_texts(ax1.get_legend(), ['existing wind farm'])
     add_north(ax=ax1)
-    # add_scale_bar(ax=ax1, lon0=-2, lat0=54.8, length=200, size=0.05)
 
     add_legend_column(conservation)
     ax2.set_title('conservation')
@@ -148,13 +147,21 @@ def show_factors():
     replace_legend_texts(ax11.get_legend(), ['0.6-0.9', '0.9-1.2', '1.2-1.6', '1.6-2.0', '2.0-2.8'],
                          legend_title='prec (L)')
 
+    legend_kwds_right = {'loc': 'center right',
+                         'bbox_to_anchor': (1, .42),
+                         'markerscale': 0.3,
+                         'title_fontsize': 'xx-small',
+                         'fontsize': 'xx-small'}
     add_legend_column(road)
     ax12.set_title('road')
     ax12.set_axis_off()
     road.to_crs(STATIC_CRS).plot(ax=ax12, linewidth=1, alpha=0.4, column='legend', cmap='gray', scheme='NaturalBreaks',
-                                 k=1, legend=True, legend_kwds=legend_kwds)
+                                 k=1, legend=True, legend_kwds=legend_kwds_right)
     south_scotland.to_crs(STATIC_CRS).plot(ax=ax12, alpha=.2, color='grey')
     replace_legend_texts(ax12.get_legend(), ['road'])
+    add_scale_bar(ax=ax12, lon0=370000, lat0=535000)
+    # 195874,530251
+    # 398018,687573
 
 
 if __name__ == '__main__':
