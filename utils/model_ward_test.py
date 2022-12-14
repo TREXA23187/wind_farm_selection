@@ -22,7 +22,7 @@ from pysal.lib import weights
 
 from utils.geo_file_path import south_scotland, scotland_power_station, scotland_residence, conservation, wind_farm, \
     temperature, precipitation, population, road, community_council, landscape
-from add_widget import add_north, add_scale_bar
+from utils.add_widget import add_north, add_scale_bar
 
 plt.rcParams['font.sans-serif'] = ['Arial Unicode MS']
 plt.rcParams['axes.unicode_minus'] = False

@@ -1,6 +1,6 @@
 from rasterio import plot as raster_plot
 import matplotlib.pyplot as plt
-from add_widget import add_north, add_scale_bar
+from utils.add_widget import add_north, add_scale_bar
 
 from utils.geo_file_path import south_scotland, scotland_power_station, scotland_residence, conservation, wind_farm, \
     temperature, precipitation, population, slope, aspect, land_use, wind_speed, road
