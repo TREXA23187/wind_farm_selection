@@ -45,14 +45,14 @@ def show_factors():
     ax11 = axes[10]
     ax12 = axes[11]
 
-    add_legend_column(wind_farm)
-    ax1.set_title('existing wind farm')
-    ax1.set_axis_off()
+    add_legend_column(wind_farm)  # add a column as legend
+    ax1.set_title('existing wind farm')  # set title
+    ax1.set_axis_off()  # not show axis
     wind_farm.to_crs(STATIC_CRS).plot(ax=ax1, column='legend', cmap='Set1', scheme='NaturalBreaks', k=1, legend=True,
-                                      legend_kwds=legend_kwds)
-    south_scotland.to_crs(STATIC_CRS).plot(ax=ax1, alpha=.2, color='orange')
-    replace_legend_texts(ax1.get_legend(), ['existing wind farm'])
-    add_north(ax=ax1)
+                                      legend_kwds=legend_kwds)  # plot with legend
+    south_scotland.to_crs(STATIC_CRS).plot(ax=ax1, alpha=.2, color='orange')  # plot south scotland as basemap
+    replace_legend_texts(ax1.get_legend(), ['existing wind farm'])  # set legend text
+    add_north(ax=ax1)  # add compass
 
     add_legend_column(conservation)
     ax2.set_title('conservation')

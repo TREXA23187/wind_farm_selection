@@ -1,11 +1,16 @@
 import geopandas as gpd
 import rasterio
+import os
 
 
 def file_path_cwd(file_path):
-    root = '/Users/chenxingyang/PycharmProjects/windFarmSelection/'
-    return f'{root}{file_path}'
-    # return f'{os.getcwd()}/{file_path}'
+    project_file_name = 'windFarmSelection'
+
+    current_path = os.path.dirname(__file__)
+    n = current_path.find(project_file_name)
+
+    root = os.path.join(current_path[:n], project_file_name)
+    return os.path.join(root, file_path)
 
 
 # polyline
@@ -32,4 +37,4 @@ land_use = rasterio.open(file_path_cwd('resource/LandUse/south_scotland_land_use
 wind_speed = rasterio.open(file_path_cwd('resource/WindSpeed/south_scotland_wind_speed.tif'))
 
 if __name__ == '__main__':
-    print(road)
+    path = os.path.dirname(__file__)

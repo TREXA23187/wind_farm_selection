@@ -20,6 +20,7 @@ from matplotlib import cm
 
 from utils.geo_file_path import south_scotland, scotland_power_station, scotland_residence, conservation, wind_farm, \
     temperature, precipitation, population, road, community_council, landscape
+from add_widget import add_north, add_scale_bar
 
 plt.rcParams['font.sans-serif'] = ['Arial Unicode MS']
 plt.rcParams['axes.unicode_minus'] = False
@@ -151,6 +152,7 @@ def plot_ward_factors():
 
     # plot
     plot_axis_grid('wind_farm', ax1, wind_farm_overlay_grid)
+    add_north(ax=ax1)
     plot_axis_grid('residence', ax2, residence_grid)
     plot_axis_grid('power_station', ax3, power_station_grid)
     plot_axis_grid('conservation', ax4, conservation_overlay_grid)
@@ -162,10 +164,11 @@ def plot_ward_factors():
     plot_axis_grid('landscape', ax10, landscape_grid)
     plot_axis_grid('wind_speed', ax11, wind_speed_grid)
     plot_axis_grid('land_use', ax12, land_use_grid)
+    add_scale_bar(ax=ax12, lon0=370000, lat0=535000)
 
-    norm = colors.Normalize(vmin=0, vmax=1)
-    fig.colorbar(cm.ScalarMappable(norm=norm, cmap='YlOrRd'), ax=axis, orientation='horizontal', shrink=.7, aspect=30,
-                 pad=.1)
+    # norm = colors.Normalize(vmin=0, vmax=1)
+    # fig.colorbar(cm.ScalarMappable(norm=norm, cmap='YlOrRd'), ax=axis, orientation='horizontal', shrink=.7, aspect=30,
+    #              pad=.1)
 
 
 def plot_coefficient(geo_data, cof_data_column, gwr_filter_t):
@@ -190,11 +193,8 @@ def plot_coefficient(geo_data, cof_data_column, gwr_filter_t):
         ax = axes[i]
         ax.set_axis_off()
 
-    # norm = colors.Normalize(vmin=-1, vmax=1)
-    # fig.colorbar(cm.ScalarMappable(norm=norm, cmap='Blues'), ax=axes, orientation='horizontal', shrink=.7,
-    #              aspect=30,
-    #              pad=.1)
-
+    add_north(ax=axes[0])
+    add_scale_bar(ax=axes[-1], lon0=370000, lat0=535000)
 
 
 def ols(y, x, w, name_y, name_x):
@@ -333,7 +333,7 @@ def model_ward(is_gwr_summary=False, is_plot_coefficient=False, method_list=['gw
 
 
 if __name__ == '__main__':
-    # plot_ward_factors()
+    plot_ward_factors()
     model_ward(is_gwr_summary=True, is_plot_coefficient=True, method_list=[])
 
     plt.show()

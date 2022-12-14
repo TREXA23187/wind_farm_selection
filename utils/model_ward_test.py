@@ -13,7 +13,6 @@ from spreg.ml_error import ML_Error
 from spreg import GM_Lag
 from spreg import GM_Error
 
-from matplotlib.colors import ListedColormap
 from matplotlib import colors
 from matplotlib import cm
 
@@ -23,6 +22,7 @@ from pysal.lib import weights
 
 from utils.geo_file_path import south_scotland, scotland_power_station, scotland_residence, conservation, wind_farm, \
     temperature, precipitation, population, road, community_council, landscape
+from add_widget import add_north, add_scale_bar
 
 plt.rcParams['font.sans-serif'] = ['Arial Unicode MS']
 plt.rcParams['axes.unicode_minus'] = False
@@ -111,9 +111,8 @@ def plot_axis_grid(name, ax, display_grid=None):
     display_grid[f'{name}_result_normalised'] = (result - result.min(axis=0)) / (
             result.max(axis=0) - result.min(axis=0))
     if display_grid is not None:
-        # display_grid.plot(ax=ax, column=f'{name}_result_normalised', cmap='YlOrRd', edgecolor='Black', legend=True,
-        #                   linewidth=.5)
-        display_grid.plot(ax=ax, column=f'{name}_result_normalised', cmap='YlOrRd', edgecolor='Black', linewidth=.5)
+        display_grid.plot(ax=ax, column=f'{name}_result_normalised', cmap='YlOrRd', edgecolor='Black', legend=True,
+                          linewidth=.5)
 
 
 def plot_ward_factors():
@@ -150,6 +149,7 @@ def plot_ward_factors():
 
     # plot
     plot_axis_grid('wind_farm', ax1, wind_farm_overlay_grid)
+    add_north(ax=ax1)
     plot_axis_grid('residence', ax2, residence_grid)
     plot_axis_grid('power_station', ax3, power_station_grid)
     plot_axis_grid('conservation', ax4, conservation_overlay_grid)
@@ -161,9 +161,10 @@ def plot_ward_factors():
     plot_axis_grid('landscape', ax10, landscape_grid)
     plot_axis_grid('landscape', ax11, landscape_grid)
     plot_axis_grid('landscape', ax12, landscape_grid)
-    norm = colors.Normalize(vmin=0, vmax=1)
-    fig.colorbar(cm.ScalarMappable(norm=norm, cmap='YlOrRd'), ax=axis, orientation='horizontal', shrink=.7, aspect=30,
-                 pad=.1)
+    add_scale_bar(ax=ax12, lon0=370000, lat0=535000)
+    # norm = colors.Normalize(vmin=0, vmax=1)
+    # fig.colorbar(cm.ScalarMappable(norm=norm, cmap='YlOrRd'), ax=axis, orientation='horizontal', shrink=.7, aspect=30,
+    #              pad=.1)
 
 
 def plot_coefficient(geo_data, cof_data_column, gwr_filter_t):
@@ -189,6 +190,9 @@ def plot_coefficient(geo_data, cof_data_column, gwr_filter_t):
     for i in range(0, len(axes)):
         ax = axes[i]
         ax.set_axis_off()
+
+    add_north(ax=axes[0])
+    add_scale_bar(ax=axes[-1], lon0=370000, lat0=535000)
 
     # norm = colors.Normalize(vmin=-1, vmax=1)
     # fig.colorbar(cm.ScalarMappable(norm=norm, cmap='Blues'), ax=axes, orientation='horizontal', shrink=.7,
@@ -263,7 +267,7 @@ def merge_columns(merge_data_list, merge_data_column):
     return merge_result
 
 
-def model_ward(is_summary=False, is_plot_coefficient=False, method_list=[]):
+def model_ward(is_summary=False, is_plot_coefficient=False):
     residence_grid = get_ward_contain_point('residence', scotland_residence)
 
     scotland_power_station['id'] = scotland_power_station.index
@@ -337,7 +341,7 @@ def model_ward(is_summary=False, is_plot_coefficient=False, method_list=[]):
 
 
 if __name__ == '__main__':
-    # plot_ward_factors()
-    model_ward(is_summary=False, is_plot_coefficient=True, method_list=['gwr'])
+    plot_ward_factors()
+    model_ward(is_summary=False, is_plot_coefficient=True)
 
     plt.show()
