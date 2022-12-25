@@ -1,6 +1,6 @@
 from utils.show_factor import show_factors
 from utils.gwr_grid_test import gwr_grid, plot_factors
-from utils.model_ward_test import model_ward, plot_ward_factors
+from utils.model_ward_release import model_ward, plot_ward_factors
 
 import matplotlib.pyplot as plt
 

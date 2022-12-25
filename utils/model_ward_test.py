@@ -13,11 +13,6 @@ from spreg.ml_error import ML_Error
 from spreg import GM_Lag
 from spreg import GM_Error
 
-from matplotlib import colors
-from matplotlib import cm
-
-from spreg.diagnostics import likratiotest
-
 from pysal.lib import weights
 
 from utils.geo_file_path import south_scotland, scotland_power_station, scotland_residence, conservation, wind_farm, \
@@ -296,9 +291,9 @@ def model_ward(is_summary=False, is_plot_coefficient=False):
     x = merge_result[merge_data_column].values
     coordinates = list(zip(wind_farm_overlay_grid.centroid.x, wind_farm_overlay_grid.centroid.y))
 
-    # w_queen = weights.Queen.from_dataframe(community_council)
-    #
-    # ols_result = ols(y, x, w_queen, name_y='wind_farm', name_x=merge_data_column)
+    w_queen = weights.Queen.from_dataframe(community_council)
+
+    ols_result = ols(y, x, w_queen, name_y='wind_farm', name_x=merge_data_column)
 
     gwr_result = gwr(y, x, coordinates)
 
@@ -341,7 +336,7 @@ def model_ward(is_summary=False, is_plot_coefficient=False):
 
 
 if __name__ == '__main__':
-    plot_ward_factors()
+    # plot_ward_factors()
     model_ward(is_summary=False, is_plot_coefficient=True)
 
     plt.show()

@@ -19,7 +19,7 @@ from matplotlib import colors
 from matplotlib import cm
 
 from utils.geo_file_path import south_scotland, scotland_power_station, scotland_residence, conservation, wind_farm, \
-    temperature, precipitation, population, road, community_council, landscape
+    temperature, precipitation, population, road, community_council, landscape, file_path_cwd
 from utils.add_widget import add_north, add_scale_bar
 
 plt.rcParams['font.sans-serif'] = ['Arial Unicode MS']
@@ -31,11 +31,11 @@ STATIC_CRS = CRS('epsg:27700')
 
 GRID_NUM = 32
 
-wind_speed = gpd.read_file('../resource/RasterToVector/wind_speed_shp.shp')
-land_use = gpd.read_file('../resource/RasterToVector/land_use_shp.shp')
+wind_speed = gpd.read_file(file_path_cwd('resource/RasterToVector/wind_speed_shp.shp'))
+land_use = gpd.read_file(file_path_cwd('resource/RasterToVector/land_use_shp.shp'))
 
-# aspect = gpd.read_file('../resource/RasterToVector/aspect_shp.shp')
-slope = gpd.read_file('../resource/RasterToVector/slope_shp.shp')
+# aspect = gpd.read_file(file_path_cwd'/resource/RasterToVector/aspect_shp.shp'))
+slope = gpd.read_file(file_path_cwd('resource/RasterToVector/slope_shp.shp'))
 
 
 def generate_ward():
@@ -263,7 +263,7 @@ def merge_columns(merge_data_list, merge_data_column, merge_result=generate_ward
     return merge_result
 
 
-def model_ward(is_gwr_summary=False, is_plot_coefficient=False, method_list=['gwr']):
+def model_ward(is_summary=False, is_plot_coefficient=False):
     wind_farm_overlay_grid = get_ward_overlay_area('wind_farm', wind_farm)
 
     residence_grid = get_ward_contain_point('residence', scotland_residence)
@@ -334,6 +334,6 @@ def model_ward(is_gwr_summary=False, is_plot_coefficient=False, method_list=['gw
 
 if __name__ == '__main__':
     plot_ward_factors()
-    model_ward(is_gwr_summary=True, is_plot_coefficient=True, method_list=[])
+    model_ward(is_summary=True, is_plot_coefficient=True)
 
     plt.show()
