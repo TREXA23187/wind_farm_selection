@@ -32,10 +32,11 @@ STATIC_CRS = CRS('epsg:27700')
 GRID_NUM = 32
 
 wind_speed = gpd.read_file(file_path_cwd('resource/RasterToVector/wind_speed_shp.shp'))
-land_use = gpd.read_file(file_path_cwd('resource/RasterToVector/land_use_shp.shp'))
+land_cover = gpd.read_file(file_path_cwd('resource/RasterToVector/land_use_shp.shp'))
 
-# aspect = gpd.read_file(file_path_cwd'/resource/RasterToVector/aspect_shp.shp'))
+aspect = gpd.read_file(file_path_cwd('resource/RasterToVector/aspect_shp.shp'))
 slope = gpd.read_file(file_path_cwd('resource/RasterToVector/slope_shp.shp'))
+elevation = gpd.read_file(file_path_cwd('resource/Elevation/south_scotland_elevation.shp'))
 
 
 def generate_ward():
@@ -141,29 +142,31 @@ def plot_ward_factors():
     temperature_overlay_grid = get_ward_overlay_area('temperature', temperature, value_column='aveTemp')
     precipitation_overlay_grid = get_ward_overlay_area('precipitation', precipitation, value_column='prSum')
     population_overlay_grid = get_ward_overlay_area('population', population, value_column='SSP1_2020')
-    landscape_grid = get_ward_overlay_area('landscape', landscape)
+    # aspect_grid = get_ward_overlay_area('aspect', aspect)
+    elevation_grid = get_ward_overlay_area('elevation', elevation[elevation['value'] < 300], value_column='value')
 
     road_overlay_grid = get_ward_overlay_line('road', road)
     community_council_grid = get_ward_overlay_line('community_council', community_council)
 
     wind_speed_grid = get_ward_overlay_area('wind_speed', wind_speed[wind_speed['DN'] > 6], value_column='DN')
-    land_use_grid = get_ward_overlay_area('land_use', land_use[land_use['DN'] <= 10], value_column='DN')
+    land_cover_grid = get_ward_overlay_area('land_cover', land_cover[land_cover['DN'] <= 10], value_column='DN')
     slope_grid = get_ward_overlay_area('slope', slope[slope['DN'] < 15], value_column='DN')
 
     # plot
     plot_axis_grid('wind_farm', ax1, wind_farm_overlay_grid)
     add_north(ax=ax1)
-    plot_axis_grid('residence', ax2, residence_grid)
-    plot_axis_grid('power_station', ax3, power_station_grid)
-    plot_axis_grid('conservation', ax4, conservation_overlay_grid)
+    plot_axis_grid('conservation', ax2, conservation_overlay_grid)
+    plot_axis_grid('residence', ax3, residence_grid)
+    plot_axis_grid('power_station', ax4, power_station_grid)
     plot_axis_grid('temperature', ax5, temperature_overlay_grid)
-    plot_axis_grid('precipitation', ax6, precipitation_overlay_grid)
-    plot_axis_grid('population', ax7, population_overlay_grid)
-    plot_axis_grid('road', ax8, road_overlay_grid)
-    plot_axis_grid('slope', ax9, slope_grid)
-    plot_axis_grid('landscape', ax10, landscape_grid)
-    plot_axis_grid('wind_speed', ax11, wind_speed_grid)
-    plot_axis_grid('land_use', ax12, land_use_grid)
+    plot_axis_grid('land_cover', ax6, land_cover_grid)
+    plot_axis_grid('slope', ax7, slope_grid)
+    plot_axis_grid('elevation', ax8, elevation_grid)
+    plot_axis_grid('population', ax9, population_overlay_grid)
+    plot_axis_grid('wind_speed', ax10, wind_speed_grid)
+    plot_axis_grid('precipitation', ax11, precipitation_overlay_grid)
+    plot_axis_grid('road', ax12, road_overlay_grid)
+
     add_scale_bar(ax=ax12, lon0=370000, lat0=535000)
 
     # norm = colors.Normalize(vmin=0, vmax=1)
@@ -266,25 +269,29 @@ def merge_columns(merge_data_list, merge_data_column, merge_result=generate_ward
 def model_ward(is_summary=False, is_plot_coefficient=False):
     wind_farm_overlay_grid = get_ward_overlay_area('wind_farm', wind_farm)
 
+    conservation_overlay_grid = get_ward_overlay_area('conservation', conservation)
     residence_grid = get_ward_contain_point('residence', scotland_residence)
     scotland_power_station['id'] = scotland_power_station.index
     power_station_grid = get_ward_contain_point('power_station', scotland_power_station)
-    conservation_overlay_grid = get_ward_overlay_area('conservation', conservation)
+
     temperature_overlay_grid = get_ward_overlay_area('temperature', temperature, value_column='aveTemp')
+    land_cover_grid = get_ward_overlay_area('land_cover', land_cover[land_cover['DN'] <= 10], value_column='DN')
+    slope_grid = get_ward_overlay_area('slope', slope[slope['DN'] < 15], value_column='DN')
+    # aspect_grid = get_ward_overlay_area('aspect', aspect[aspect['DN']])
+    elevation_grid = get_ward_overlay_area('elevation', elevation[elevation['value'] < 300], value_column='value')
+
     precipitation_overlay_grid = get_ward_overlay_area('precipitation', precipitation, value_column='prSum')
     population_overlay_grid = get_ward_overlay_area('population', population, value_column='SSP1_2020')
     road_overlay_grid = get_ward_overlay_line('road', road)
-    slope_grid = get_ward_overlay_area('slope', slope[slope['DN'] < 15], value_column='DN')
-    landscape_grid = get_ward_overlay_area('landscape', landscape)
-    wind_speed_grid = get_ward_overlay_area('wind_speed', wind_speed, value_column='DN')
-    land_use_grid = get_ward_overlay_area('land_use', land_use[land_use['DN'] <= 10], value_column='DN')
 
-    merge_data_list = [residence_grid, power_station_grid, conservation_overlay_grid, temperature_overlay_grid,
-                       precipitation_overlay_grid, population_overlay_grid, road_overlay_grid,
-                       slope_grid, landscape_grid, wind_speed_grid, land_use_grid]
-    merge_data_column = ['residence_result', 'power_station_result', 'conservation_result', 'temperature_result',
-                         'precipitation_result', 'population_result', 'road_result',
-                         'slope_result', 'landscape_result', 'wind_speed_result', 'land_use_result']
+    wind_speed_grid = get_ward_overlay_area('wind_speed', wind_speed, value_column='DN')
+
+    merge_data_list = [conservation_overlay_grid, residence_grid, power_station_grid, temperature_overlay_grid,
+                       land_cover_grid, slope_grid, elevation_grid, population_overlay_grid, wind_speed_grid,
+                       precipitation_overlay_grid, road_overlay_grid]
+    merge_data_column = ['conservation_result', 'residence_result', 'power_station_result', 'temperature_result',
+                         'land_cover_result', 'slope_result', 'elevation_result', 'population_result',
+                         'wind_speed_result', 'precipitation_result', 'road_result']
 
     merge_result = merge_columns(merge_data_list, merge_data_column)
 
@@ -299,41 +306,38 @@ def model_ward(is_summary=False, is_plot_coefficient=False):
     # gwr_result = gwr(y, x, coordinates)
     # gwr_result.summary()
 
-    mgwr_result = mgwr(y, x, coordinates)
-    mgwr_result.summary()
+    # mgwr_result = mgwr(y, x, coordinates)
+    # mgwr_result.summary()
 
     # ml_lag_result = ml_lag(y, x, w_queen, name_y='wind_farm', name_x=merge_data_column)
     # print(ml_lag_result.summary)
     #
     # ml_error_result = ml_error(y, x, w_queen, name_y='wind_farm', name_x=merge_data_column)
     # print(ml_error_result.summary)
-
-    # gm_lag_result = gm_lag(y, x, w_queen, name_y='wind_farm', name_x=merge_data_column)
-    # print(gm_lag_result.summary)
     #
-    # gm_error_result = gm_error(y, x, w_queen, name_y='wind_farm', name_x=merge_data_column)
-    # print(gm_error_result.summary)
+    gm_lag_result = gm_lag(y, x, w_queen, name_y='wind_farm', name_x=merge_data_column)
+    print(gm_lag_result.summary)
 
-    # if is_gwr_summary:
-    #     method_results.summary()
+    gm_error_result = gm_error(y, x, w_queen, name_y='wind_farm', name_x=merge_data_column)
+    print(gm_error_result.summary)
+
+    # if is_plot_coefficient:
+    #     cof_data_column = ['cof_wind_farm'] + [f'cof_{col}' for col in merge_data_column]
     #
-    if is_plot_coefficient:
-        cof_data_column = ['cof_wind_farm'] + [f'cof_{col}' for col in merge_data_column]
-
-        gwr_coefficient = pd.DataFrame(mgwr_result.params, columns=cof_data_column)
-        gwr_filter_t = pd.DataFrame(mgwr_result.filter_tvals())
-
-        x_data_geo = merge_result
-
-        x_data_geo = x_data_geo.join(gwr_coefficient)
-
-        plot_coefficient(x_data_geo, cof_data_column, gwr_filter_t)
+    #     gwr_coefficient = pd.DataFrame(gwr_result.params, columns=cof_data_column)
+    #     gwr_filter_t = pd.DataFrame(gwr_result.filter_tvals())
+    #
+    #     x_data_geo = merge_result
+    #
+    #     x_data_geo = x_data_geo.join(gwr_coefficient)
+    #
+    #     plot_coefficient(x_data_geo, cof_data_column, gwr_filter_t)
 
     print('-=-=-=-=-=-=-=-=-gwr-ward-main-function-finished-=-=-=-=-=-=-=-=-')
 
 
 if __name__ == '__main__':
-    plot_ward_factors()
+    # plot_ward_factors()
     model_ward(is_summary=True, is_plot_coefficient=True)
 
     plt.show()

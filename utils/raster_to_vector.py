@@ -4,7 +4,7 @@ import os
 from osgeo import gdal, ogr, osr
 
 start_time = datetime.datetime.now()
-raster = '../resource/Elevation/slope.tif'
+raster = '../resource/Elevation/south_scotland_elevation.tif'
 
 inraster = gdal.Open(raster)
 inband = inraster.GetRasterBand(1)  # 这个波段就是最后想要转为矢量的波段，如果是单波段数据的话那就都是1

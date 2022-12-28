@@ -31,6 +31,7 @@ scotland_power_station = gpd.read_file(file_path_cwd('resource/EnergySupply/sout
 scotland_residence = gpd.read_file(file_path_cwd('resource/Residence/south_scotland_residence.shp'))
 
 # raster
+elevation = rasterio.open(file_path_cwd('resource/Elevation/south_scotland_elevation.tif'))
 slope = rasterio.open(file_path_cwd('resource/Elevation/slope.tif'))
 aspect = rasterio.open(file_path_cwd('resource/Elevation/aspect.tif'))
 land_use = rasterio.open(file_path_cwd('resource/LandUse/south_scotland_land_use.tif'))

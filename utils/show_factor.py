@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from utils.add_widget import add_north, add_scale_bar
 
 from utils.geo_file_path import south_scotland, scotland_power_station, scotland_residence, conservation, wind_farm, \
-    temperature, precipitation, population, slope, aspect, land_use, wind_speed, road
+    temperature, precipitation, population, slope, aspect, land_use, wind_speed, road, elevation
 
 STATIC_CRS = 'epsg:27700'
 
@@ -28,7 +28,7 @@ def replace_legend_texts(legend, new_legend_texts, legend_title=None):
 
 def show_factors():
     fig, ax = plt.subplots(nrows=3, ncols=4, figsize=(12, 7), dpi=100)
-    fig.suptitle('Factors')
+    fig.suptitle('Datasets')
 
     axes = ax.flatten()
 
@@ -109,17 +109,22 @@ def show_factors():
         cmap='terrain'
     )
 
-    ax8.set_title('aspect')
+    ax8.set_title('elevation')
     ax8.set_axis_off()
-    population.plot(ax=ax8, column='SSP1_2020', cmap='Greys', scheme='NaturalBreaks', k=4, legend=True,
+    population.plot(ax=ax8, column='SSP1_2020', cmap='gray', scheme='NaturalBreaks', k=5, legend=True,
                     legend_kwds=legend_kwds)
-    replace_legend_texts(ax8.get_legend(), ['0-90', '90-180', '180-270', '270-260'],
-                         legend_title='aspect (°)')
+    replace_legend_texts(ax8.get_legend(), ['-30-140', '140-310', '310-480', '480-650', '650-820'],
+                         legend_title='elevation (m)')
     raster_plot.show(
-        aspect,
+        south_scotland_elevation,
         ax=ax8,
-        cmap='Greys'
+        cmap='gray'
     )
+    # raster_plot.show(
+    #     aspect,
+    #     ax=ax8,
+    #     cmap='Greys'
+    # )
 
     ax9.set_title('population')
     ax9.set_axis_off()
