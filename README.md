@@ -1,7 +1,8 @@
 ## Wind Farm Selection in Southern Scotland
 
 wind_farm_resource:
-https://pan.baidu.com/s/1lChEqwGumxRPfZfz93iECA?pwd=wind
+~~https://pan.baidu.com/s/1lChEqwGumxRPfZfz93iECA?pwd=wind~~
+https://pan.baidu.com/s/1orss9lbNJsvjF3wHQlHRew?pwd=wind
 
 本项目所需用到的Southern Scatland的各项数据，下载后放到与`main.py`同级目录下。
 
